@@ -8,7 +8,9 @@ output: html_document
 #Requerimentos
 ```{r}
 library(ggplot2)
-read.csv()
+library(lattice)
+housing <- read.csv("~/hello-world/DataSets/landdata-states.csv")
+head(housing[1:5])
 ```
 
 
@@ -23,9 +25,11 @@ Neste capítulo será abordado do básico ao intermediário do ggplot2, ou seja, da 
 Nesta seção iremos abordar o conjunto de funções básicas do R. A princípio não há nada de errado com ele, mas para apresentações esses gráficos podem se tornar um problema, sem contar que ao longo dos códigos, os gráficos básicos podem conter uma programação muito pesada e muitas vezes perder a conexão entre um comando do gráfico e outro. Abaixo vê-se um exemplo dessa diferença:
 
 ```{r}
-hist(mtcars$disp)
+#Basic
+hist(housing$Home.Value)
 
-ggplot(mtcars, aes(x = disp)) +
+#ggplot2
+ggplot(housing, aes(x = Home.Value)) +
   geom_histogram()
 ```
 
@@ -35,11 +39,11 @@ Agora, e se tivéssemos que adicionar muitos aspectos aos nossos gráficos? Poderí
 
 ```{r}
 #Basic
-plot(disp ~ mpg,
-     data=subset(mtcars, cyl == 6))
-points(disp ~ mpg, col="red",
-       data=subset(mtcars, cyl == 4))
-legend(22, ,
+plot(Home.Value ~ Date,
+     data=subset(housing, State == "MA"))
+points(Home.Value ~ Date, col="red",
+       data=subset(housing, State == "TX"))
+legend(1975, 400000,
        c("MA", "TX"), title="State",
        col=c("black", "red"),
        pch=c(1, 1))
@@ -55,4 +59,57 @@ Percebe-se a grande diferença entre os dois e como ao longo em que vão sendo adi
 
 ##Por quê o ggplot é mais fácil?
 
-O ggplot 2 foi criado com o intuito de se tornar uma ferramenta mais simples de ser digitada, desta forma foi intitulado como a gramática dos gráficos.
+O ggplot 2 foi criado com o intuito de se tornar uma ferramenta mais simples de ser digitada, pois possui a gramãtica dos gráficos. A seguir vamos ver sobre o pacote Lattice e comparalá-lo ao ggplot2.
+
+#Lattice
+
+O pacote Lattice possui vantagens e desvantagens sobre o ggplot2, é o maior concorrente quando o assunto é gráfico. Sua desvantagem é o difícil manuseio, o pacote requer que o usuário tenha um vasto conhecimento em funções para poder fazer a menor das adaptações ao gráfico. Apesar disso, sua renderização é muito mais veloz que a do ggplot e para bancos de dados razoáveis, pode lhe poupar certo tempo.  
+
+O ggplot2 por sua vez poupa tempo na escrita, já que não é necessário criar funções adjacentes para fazer o que é preciso, e como principal arma, no ggplot2 é possível modificar todos os aspectos do gráfico a seu bel-prazer. Seu principal problema é a demora para a renderização, outros problemas são a ausência de gráficos 3D e alguns gráficos necessitam de conhecimento profundo em funções grid, mas nada que vá fazer a diferença para a parte estatística do curso.
+
+##Funções Lattice
+
+Na opinião do autor a maior utilidade do Lattice é a divisão em "Facetas". Podemos dividir os gráficos de forma que eles se dividam segundo uma variável, sendo esta um fator ou de caracteres. Exemplo:
+
+```{r}
+xyplot(Date ~ Home.Value | region, data = housing, type = c("p", "r"))
+```
+
+Este foi um gráfico para mostrar uma função do Lattice e alguns argumentos. Agora, iremos ver as principais funções de gráficos do Lattice, onde o leitor deve se sentir à vontade para pesquisar mais funções e aprender mais sobre, para aprender mais entre em [Lattice](https://cran.r-project.org/web/packages/lattice/lattice.pdf).
+
+###xyplot
+
+Esta é a função mais básica do Laticce e engloba os gráficos que são representados em coordenadas cartesianas. Para pessoas que já conhecem programação de regressão em R, sabem o que é a classe formula, o primeiro argumento da função deve ser descrito como uma fórmula, ou seja, "Y explicado por X" e às vezes, "Y explicado por X e divido por K", em notação de fórmula no R isto ficaria da seguinte maneira: `Y ~ X` ou `Y ~ X | Z`, assim como tivemos no exemplo acima.  
+
+Outros argumentos úteis são: `data` que indica de qual Data Frame estas variáveis serão retiradas, `xlab` e `ylab` que dão valores de labels astes de x e y, respectivamente, `scales` que determina a escala que x e y devem possuir. Existem outros argumentos, mas recomendasse que eles sejam usados apenas conforme a necessidade, e eles só serão necessários caso o PDF do Cran seja estudado, portanto em caso de dúvidas, leia o Cran.
+
+###Outros Gráficos
+
+Existem outros tipos de gráficos no Lattice, como `barchart`, `histogram`, `cloud`, e muitos outros, quando houver tempo hábil e for conviniente estudar sobre tais gráficos eles voltarão e veremos todos com mais calma.
+
+###Barchart
+
+Barchart recebe um objeto table, ou seja, uma tabela de frequências, e com base nisso faz um gráfico de barras. Nâo possui nem de perto o mesmo tanto de argumentos que o `xyplot`, mas ainda assim possui uma gama interessante de argumentos. `data` NÃO deve ser especificado, horizontal deve conter um valor lógico indicando se a variável deve ser colocada na horizontal ou não, o default é F.
+
+```{r}
+barplot(table(housing$region))
+```
+
+Como o objetivo desta aula nâo é ensinar tudo sobre o Lattice, não irei me aprofundar no pacote Rcolorbrewer, mas é importante saber que o sistema de cores do Lattice acontece a partir dele. Essas cores devem ser colocadas em uma lista onde o primeiro elemento da lista de ser `superpose.polygon = list(col = mycolors` e mycolors deve ser um objeto criado utilizando `brewer.pal` do Rcolorbrewer. Esta é uma grande desvantagem do Lattice, é muito chato fazer quaisquer tipos de personalização, e por isso não será abordado agora.
+
+###Histogram
+
+Um dos últimos tipos de gráficos é o `histogram`, o famoso histograma dispensa apresentações e é bem simples de se fazer. O primeiro argumento deve ser a variável que será calculado, na opinião do autor, é melhor trabalhar em formato de fórmula, pois se especifica o `data` depois, caso não se deseje fazer tal procedimento é só colocar a variável vetorizada no argumento, como mostra o exemplo a seguir:
+
+```{r}
+#Formula
+histogram(~Home.Value, data = housing)
+#N formula
+histogram(housing$Home.Value)
+```
+
+Os outros argumentos são os mesmos argumentos para mudança de nomes e organização da haste, em caso de dúvidas consulte o CRAN.
+
+##Final
+
+Esta foi uma introdução leve sobre o Lattice, caso de dúvidas pode me perguntar ou procurar a resposta no Cran.
