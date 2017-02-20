@@ -1,0 +1,58 @@
+---
+title: "ggplot2"
+author: "Daniel Viegas"
+date: "20 de fevereiro de 2017"
+output: html_document
+---
+
+#Requerimentos
+```{r}
+library(ggplot2)
+read.csv()
+```
+
+
+#Introdução
+
+O pacote ggplot2 é um poderoso pacote que pode facilitar a vida na hora de se fazer um gráfico em R. Em questão de escrita ele pode parecer um pouco mais complicado que as funções básicas de pacote do R e o pacote Lattice(Também serão brevemente abordados neste capítulo).  
+
+Neste capítulo será abordado do básico ao intermediário do ggplot2, ou seja, da criação de gráficos simples ao manuseamento do background e grids do gráfico, o leitor pode se sentir livre para visitar o site de referências do [ggplot2](http://docs.ggplot2.org/current/) e estudar todas as ferramentas que este pacote oferece.
+
+#R stats
+
+Nesta seção iremos abordar o conjunto de funções básicas do R. A princípio não há nada de errado com ele, mas para apresentações esses gráficos podem se tornar um problema, sem contar que ao longo dos códigos, os gráficos básicos podem conter uma programação muito pesada e muitas vezes perder a conexão entre um comando do gráfico e outro. Abaixo vê-se um exemplo dessa diferença:
+
+```{r}
+hist(mtcars$disp)
+
+ggplot(mtcars, aes(x = disp)) +
+  geom_histogram()
+```
+
+Percebe-se que para gráficos pequenos a programação do ggplot é um pouco maior, mas o gráfico básico do ggplot já é bem mais bonito.  
+
+Agora, e se tivéssemos que adicionar muitos aspectos aos nossos gráficos? Poderíamos fazer da seguinte forma:
+
+```{r}
+#Basic
+plot(disp ~ mpg,
+     data=subset(mtcars, cyl == 6))
+points(disp ~ mpg, col="red",
+       data=subset(mtcars, cyl == 4))
+legend(22, ,
+       c("MA", "TX"), title="State",
+       col=c("black", "red"),
+       pch=c(1, 1))
+#ggplot2
+ggplot(subset(housing, State %in% c("MA", "TX")),
+       aes(x=Date,
+           y=Home.Value,
+           color=State))+
+  geom_point()
+```
+
+Percebe-se a grande diferença entre os dois e como ao longo em que vão sendo adicionadas novas características ao gráfico, o ggplot vai se tornando muito mais fácil de ser manuseado.
+
+##Por quê o ggplot é mais fácil?
+
+O ggplot 2 foi criado com o intuito de se tornar uma ferramenta mais simples de ser digitada, desta forma foi intitulado como a gramática dos gráficos.
