@@ -1,5 +1,5 @@
 ---
-title: "ggplot2"
+title: "ggplot2 vs Lattice"
 author: "Daniel Viegas"
 date: "20 de fevereiro de 2017"
 output: html_document
