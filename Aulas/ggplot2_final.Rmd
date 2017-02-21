@@ -1,0 +1,82 @@
+---
+title: "ggplot2"
+author: "Daniel Viegas"
+date: "21 de fevereiro de 2017"
+output: html_document
+---
+#Requerimentos
+```{r}
+library(ggplot2)
+housing <- read.csv("~/hello-world/DataSets/landdata-states.csv")
+```
+
+
+#ggplot2
+
+Anteriormente foi falado sobre o pacote Lattice e suas vantagens e desvantagens sobre o ggplot2. Agora, iremos abordar diretamente o pacote ggplot2, voltando casualmente às diferenças com relação aos outros pacotes, apenas em questão de comparação.  
+
+Como também já comentado, o pacote ggplot2 possui uma incrível gama de funções para a criação de gráficos e a sua desvantagem é a demora com que alguns gráficos são renderizados. Até essa parte do curso não iremos otimizar nenhuma função com relação a renderização, iremos apenas trabalhar na parte visual dos nossos gráficos e torcer para nenhum trabalho com um banco de dados gigantesco apareça.
+
+##Operadores +
+
+Diferente do pacote básico do R, as informações dos gráficos no pacote ggplot2 e no Lattice são armazendas em listas. No Lattice esse poder não é tão bem usado, mas no ggplot isso permite que mais e mais detalhes sejam adicionados ao gráfico conforme a necessidade do usuário. Para adicionar gráficos e/ou detalhes usamos o sinal de `+`, esse sinal indica que o próximo comando deve ser lido juntamente ao anterior e ele deve obrigatoriamente vir na mesma linha que o código está a ser escrito.  
+
+Antes de mostrar um exemplo, devo perguntar, você sabe criar um objeto ggplot? Para construir tal objeto, usamos o comando `ggplot(data = data.frame, mapping = aes())` e após isso adiciona-se o tipo de gráfico que se deseja com o nosso operador. Agora pra ilustrar e esclarecer, finalmente, exemplo:
+
+```{r}
+#O objeto deve ser armazenado em uma variável.
+plot <- ggplot(data = housing, mapping = aes(x = Date, y = Land.Value, color = region))
+#Plottando
+plot + geom_point()
+plot <- plot + geom_point()
+```
+
+Se você não entendeu algum dos argumentos não se sinta mal, todos eles serão abordados a seguir, o importante é conseguir entender como o objeto é criado e como e como se adiciona os detalhes do gráficos.  
+
+As vezes, nós cometemos equivocos e precisamos mudar o nosso data.frame que está sendo analisado dentro do data da função `ggplot`, ou nem erramos, mas mesmo assim é necessário mudar algo em nosso banco de dados, para fazer tais mudanças nós usamos o operador `%+%`. Sempre que for necessário substituir algo dentro do nosso objeto de ggplot, nós usamos esse operador, o leitor vai ver no exemplo que é bem mais simples apenas substituir o valor, ao invés de criar outro objeto e repetir tudo o que já foi escrito. É importante lembrar que isso só pode ser feito caso a variável abrigando o outro objeto NÃO será mais utilizada, pois os dados serão sobrescritos e ninguém quer perder os gráficos que já estavam feitos, nesse caso armazene em outra variável e faça seu trabalho. Para esclarecer, olhe o exemplo:
+
+```{r}
+plot %+% subset(housing, housing$Land.Value > 200000)
+```
+
+##aes
+
+A função aes serve para definir coordenadas dentro de um ggplot, ele pode ser usado tanto dentro da função ggplot, logo após o data, ou dentro do próprio geom, porém se for utilizar diversos geom dentro de um mesmo gráfico, então recomenda-se que coloque o aes dentro do próprio ggplot, além disso, isso ajuda na especificação do grid, já que ele define os ranges a partir das variáveis que serão trabalhadas. O aes possui algumas variações como o `aes_` e o `aes_all`, mas estas funções são um pouco mais específicas e não serão tratadas neste curso. Dentro do aes colocamos quem vai ficar no eixo x, no eixo y, se alguma variável será definida por tamanho, cor e até formato. Haverá uma seção para falarmos apenas sobre isso, como o aes já foi utilizado anteriormente, caso necessite de um exemplo, pode visitar o CRAN do pacote, ou olhar com mais atenção os exemplos anteriores, fica a critério e necessidade do leitor.
+
+##geom's
+
+Geom's são os tipos de gráficos utilizados no ggplot, neles podemos utilizar as opções de aesteticos e também mudar opções dentro de cada um, de acordo com cada especificidade dos gráficos. Agora iremos ver alguns dos geom's mais importantes.
+
+###geom_abline
+
+O geom_abline cria linhas horizontais, verticais e especificadas segundo intercepto e declive. Os argumentos desta função são o mapping, que recebe um aes especificando sobre o que fazer o gráfico, data, que recebe o data.frame, slope que recebe o valor do declive, intercept, que recebe o ponto de intercepto e outros. Lembrando que os dois primeiros são condicionados a ter criado ou não um objeto ggplot.  
+__Exemplo__:
+
+```{r}
+plot <- ggplot(data = housing, aes(Date, Land.Value))
+plot + geom_abline()
+```
+
+###geom_point
+
+O famoso gráfico de dispersão, o uso é comum como sempre se usou, a ideia segue a mesma.
+
+__Exemplo__:
+
+```{r}
+plot + geom_point()
+```
+
+###geom_smooth
+
+Nem de longe o geom_abline serve pra mostrar alguma coisacom relação a reta de regressão e contorno, ele serve apenas para comparação. Para resolver tais problemas, é utilizado o geom_smooth, que possui características parecidas com o geom_point, porém ele possui um argumento chamado method que permite que você diga qual tipo de método de regressão deseja aplicar(Olhe o CRAN para ver todos os tipos de métodos).
+
+__Exemplo__:
+
+```{r}
+ggplot(data = housing, aes(Date, Home.Value))+
+    geom_smooth(method = lm)+
+      geom_point()
+```
+
+Tente tirar o mais do geom_smooth e veja o que acontece.
